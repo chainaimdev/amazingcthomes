@@ -88,37 +88,13 @@
   .photoframe { position: relative; overflow: hidden; }
 
   /* ── Fixed nav bar ────────────────────────────────────────────
-     The bar itself is transparent — no fill, no border, no shadow. Contrast
-     for the logos and links comes from two things instead:
-
-     1. A scrim painted on ::before, strongest at the very top and fading
-        to nothing at the bottom edge, so there is no visible bar boundary.
-        It sits at z-index -1; the header is position:fixed with its own
-        z-index, so it forms a stacking context and -1 puts the scrim
-        behind the content without escaping behind the page.
-     2. A text-shadow on the type, so the words hold up where the photo
-        behind them is bright.
-
-     The scrim deepens once the page scrolls past the hero, because below
-     the hero the page background is light and white type over a weak
-     scrim would wash out. Those two values are driven from the scroll
-     handler in the script below. */
-  .navbar::before {
-    content: "";
-    position: absolute; inset: 0; z-index: -1; pointer-events: none;
-    background: linear-gradient(to bottom,
-      rgb(29 45 61 / var(--scrim-top)) 0%,
-      rgb(29 45 61 / var(--scrim-mid)) 62%,
-      rgb(29 45 61 / 0) 100%);
-    backdrop-filter: blur(9px);
-    -webkit-backdrop-filter: blur(9px);
-    -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 55%, transparent 100%);
-    mask-image: linear-gradient(to bottom, #000 0%, #000 55%, transparent 100%);
-    transition: background .3s ease;
-  }
+     Solid black bar, fixed to the top and opaque at every scroll position.
+     The colour is held in --nav-bg on .navbar below, so there is one place
+     to change it. The scroll handler varies density only (padding, brand
+     size, shadow depth) — never the colour, so the logo and links never
+     restyle mid-scroll. */
   .navbar a:not(.btn) { transition: opacity .25s ease; }
   .navbar a:not(.btn):hover { opacity: 1; }
-  .navbar a, .navbar > div span { text-shadow: 0 1px 2px rgb(0 0 0 / .5), 0 2px 14px rgb(0 0 0 / .38); }
 
   /* ── "real" affiliation mark ────────────────────────────────────
      PLACEHOLDER — this is a hand-drawn reconstruction traced from a
@@ -132,10 +108,9 @@
      stem), l (mirrored bracket), on a 130x44 grid with a 4-unit stroke.
      Colour is the cyan sampled from the source image. To fold it into
      the palette instead, set --real-mark-color to var(--color-accent-300). */
-  .navbar { --real-mark-color: #3dc5f3; --scrim-top: .62; --scrim-mid: .36; }
+  .navbar { --real-mark-color: #3dc5f3; --nav-bg: #000000; }
   .real-mark {
     display: block; width: 65px; height: 22px; overflow: visible;
-    filter: drop-shadow(0 1px 3px rgb(0 0 0 / .5));
     transition: width .3s ease, height .3s ease;
   }
   .real-mark path, .real-mark circle {
@@ -167,7 +142,7 @@
 
   <div ref="{{ cursorRef }}" style="position: fixed; top: 0; left: 0; width: 34px; height: 34px; margin: -17px 0 0 -17px; border: 1px solid var(--color-accent); z-index: 150; pointer-events: none; opacity: 0; transition: opacity .3s, width .25s, height .25s, background .25s;"></div>
 
-  <header ref="{{ navRef }}" class="navbar" style="position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); padding: 18px 40px; background: transparent; transition: padding .3s ease;">
+  <header ref="{{ navRef }}" class="navbar" style="position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); padding: 18px 40px; background: var(--nav-bg); border-bottom: 1px solid rgba(255,255,255,.12); box-shadow: 0 4px 18px rgba(0,0,0,.35); transition: padding .3s ease, box-shadow .3s ease;">
     <div style="display: flex; align-items: center; gap: 16px;">
       <span style="display: flex; align-items: center;">
         <svg class="real-mark" viewBox="0 0 130 44" role="img" aria-label="real">
@@ -909,16 +884,13 @@ class Component extends DCLogic {
         raf = null;
         const y = window.scrollY || 0;
         root.style.setProperty("--sy", y);
-        // The bar stays transparent at every scroll position — only the
-        // scrim depth and the density change, never the type colour.
+        // The bar is solid black at every scroll position — only its
+        // density changes, so the logo and links never restyle mid-scroll.
         const compact = y > window.innerHeight * 0.7;
         const nav = this.navRef.current;
         if (nav) {
           nav.style.padding = compact ? "13px 40px" : "18px 40px";
-          // Past the hero the page behind the bar turns light, so the white
-          // type needs a deeper scrim to stay legible.
-          nav.style.setProperty("--scrim-top", compact ? ".84" : ".62");
-          nav.style.setProperty("--scrim-mid", compact ? ".60" : ".36");
+          nav.style.boxShadow = compact ? "0 8px 30px rgba(0,0,0,.5)" : "0 4px 18px rgba(0,0,0,.35)";
           // The affiliation mark shrinks with the bar, like the brand text.
           const mark = nav.querySelector(".real-mark");
           if (mark) {
