@@ -1,0 +1,43 @@
+{
+  "$comment": "Source of truth for which photo fills which <image-slot>. Edit this, then run: node tools/apply-images.mjs. Slot ids must match the id attributes in the pages listed below. A null file leaves that slot as an empty placeholder (the drag-and-drop UI still works).",
+  "imagesDir": "houseimages",
+  "tint": 0,
+  "pages": {
+    "amazingcthomes.dc.html": {
+      "hero-1": "2.webp",
+      "hero-2": "4.webp",
+      "hero-3": "11.jpg",
+      "hero-4": "3.jpg",
+
+      "cat-1": "5.jpg",
+      "cat-2": "10.webp",
+      "cat-3": "12.webp",
+      "cat-4": "8.jpg",
+      "cat-5": "4.webp",
+      "cat-6": "7.jpg",
+
+      "lst-1": "3.jpg",
+      "lst-2": "10.webp",
+      "lst-3": "11.jpg",
+      "lst-4": "6.jpg",
+      "lst-5": "12.webp",
+      "lst-6": "5.jpg",
+
+      "area-1": "6.jpg",
+      "area-2": "10.webp",
+      "area-3": "12.webp",
+
+      "cta-bg": "2.webp",
+
+      "ag-kavitha": null
+    },
+    "Kavitha Sathya.dc.html": {
+      "kav-portrait": null,
+      "kav-office": "7.jpg"
+    }
+  },
+  "unused": {
+    "$comment": "Files present in imagesDir but not placed, with the reason.",
+    "1.avif": "content not verified - AVIF could not be decoded for review"
+  }
+}
