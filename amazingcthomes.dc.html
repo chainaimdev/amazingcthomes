@@ -93,8 +93,8 @@
      to change it. The scroll handler varies density only (padding, brand
      size, shadow depth) — never the colour, so the logo and links never
      restyle mid-scroll. */
-  .navbar a:not(.btn) { transition: opacity .25s ease; }
-  .navbar a:not(.btn):hover { opacity: 1; }
+  .navbar a:not(.btn) { transition: opacity .25s ease, color .25s ease; }
+  .navbar nav a:not(.btn):hover { color: var(--color-accent-300); }
 
   /* ── "real" affiliation mark ────────────────────────────────────
      PLACEHOLDER — this is a hand-drawn reconstruction traced from a
@@ -120,6 +120,38 @@
     stroke-linecap: butt;
     stroke-linejoin: miter;
   }
+
+  /* ── Search comboboxes ───────────────────────────────────────
+     Hand-built rather than using <datalist>, because a datalist filters
+     its options against whatever is already in the field — so once a
+     value is chosen the list collapses to that single entry and you
+     cannot switch to another option without emptying the box first.
+     These panels always open with the full list and narrow only while
+     the user is actively typing.
+
+     The panel div is rendered empty in the markup and filled from JS, so
+     React has no children to reconcile and will not wipe it on re-render
+     (the mortgage sliders re-render this component constantly). */
+  .combo { position: relative; }
+  .combo-panel {
+    position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 60;
+    max-height: 260px; overflow-y: auto;
+    background: var(--color-bg);
+    border: 1px solid var(--color-divider);
+    box-shadow: var(--shadow-md);
+    display: none;
+  }
+  .combo-panel[data-open="true"] { display: block; }
+  .combo-opt {
+    display: block; width: 100%; text-align: left;
+    padding: 11px 14px; font-family: inherit; font-size: 14px;
+    background: none; border: 0; border-bottom: 1px solid var(--color-divider);
+    cursor: pointer; color: var(--color-text);
+  }
+  .combo-opt:last-child { border-bottom: 0; }
+  .combo-opt:hover { background: var(--color-neutral-100); }
+  .combo-opt[data-any="true"] { color: var(--color-neutral-600); letter-spacing: .1em; text-transform: uppercase; font-size: 11.5px; }
+  .quick { cursor: pointer; }
 </style>
 </helmet>
 
@@ -133,7 +165,7 @@
             <span style="display: block; width: 19px; height: 19px; border: 1.5px solid var(--color-accent-300); position: relative;"><span style="position: absolute; inset: 4px; background: var(--color-accent);"></span></span>
             <span style="font-family: var(--font-heading); font-weight: 600; letter-spacing: .38em; font-size: clamp(17px, 2.6vw, 36px); color: #fff; text-transform: uppercase;">amazingcthomes</span>
           </span>
-          <span style="font-size: 10.5px; letter-spacing: .34em; text-transform: uppercase; color: var(--color-accent-400); animation: wordin 1s ease .5s both;">Mixed residential · Est. 1994</span>
+          <span style="font-size: 10.5px; letter-spacing: .34em; text-transform: uppercase; color: var(--color-accent-400); animation: wordin 1s ease .5s both;">Mixed residential</span>
         </div>
       </div>
       <div style="position: absolute; left: 0; right: 0; bottom: -5px; height: 5px; background: linear-gradient(to bottom, var(--color-accent-700), var(--color-accent-900)); box-shadow: 0 6px 22px rgba(0,0,0,.45); animation: rollbar 1.15s linear 1.5s forwards;"></div>
@@ -155,19 +187,19 @@
         </svg>
       </span>
       <span aria-hidden="true" style="display: block; width: 1px; height: 24px; background: rgba(255,255,255,.22);"></span>
-      <a href="#top" onClick="{{ onNav }}" style="display: flex; align-items: center; gap: 10px; color: inherit;">
-        <span style="display: block; width: 15px; height: 15px; border: 1.5px solid currentColor; position: relative;">
-          <span style="position: absolute; inset: 3px; background: var(--color-accent);"></span>
+      <a href="#top" onClick="{{ onNav }}" style="display: flex; align-items: center; gap: 11px; color: #fff;">
+        <span style="display: block; width: 17px; height: 17px; border: 2px solid #fff; position: relative;">
+          <span style="position: absolute; inset: 3px; background: var(--color-accent-300);"></span>
         </span>
-        <span ref="{{ brandRef }}" style="font-family: var(--font-heading); font-weight: 600; font-size: 19px; letter-spacing: .14em; text-transform: uppercase; color: #fff;">amazingcthomes</span>
+        <span ref="{{ brandRef }}" style="font-family: var(--font-heading); font-weight: 700; font-size: 21px; letter-spacing: .12em; text-transform: uppercase; color: #fff;">amazingcthomes</span>
       </a>
     </div>
-    <nav ref="{{ linksRef }}" style="display: flex; align-items: center; gap: 26px; font-size: 13.5px; letter-spacing: .05em; white-space: nowrap; flex-shrink: 0;">
-      <a href="#buy" onClick="{{ onNav }}" style="color: #fff; opacity: .95;">Buy</a>
-      <a href="#listings" onClick="{{ onNav }}" style="color: #fff; opacity: .95;">Listings</a>
-      <a href="#sell" onClick="{{ onNav }}" style="color: #fff; opacity: .95;">Sell</a>
-      <a href="#areas" onClick="{{ onNav }}" style="color: #fff; opacity: .95;">Neighborhoods</a>
-      <a href="Kavitha Sathya.dc.html" class="btn btn-primary" style="letter-spacing: .1em; text-transform: uppercase; font-size: 12px; white-space: nowrap; flex-shrink: 0;">Contact Kavitha</a>
+    <nav ref="{{ linksRef }}" style="display: flex; align-items: center; gap: 30px; font-size: 15.5px; font-weight: 600; letter-spacing: .04em; white-space: nowrap; flex-shrink: 0;">
+      <a href="#buy" onClick="{{ onNav }}" style="color: #fff;">Buy</a>
+      <a href="#listings" onClick="{{ onNav }}" style="color: #fff;">Listings</a>
+      <a href="#sell" onClick="{{ onNav }}" style="color: #fff;">Sell</a>
+      <a href="#areas" onClick="{{ onNav }}" style="color: #fff;">Neighborhoods</a>
+      <a href="Kavitha Sathya.dc.html" class="btn btn-primary" style="letter-spacing: .09em; text-transform: uppercase; font-size: 13.5px; font-weight: 600; padding: 12px 24px; white-space: nowrap; flex-shrink: 0;">Contact Kavitha</a>
     </nav>
   </header>
 
@@ -189,14 +221,10 @@
     <div style="position: absolute; inset: 0; pointer-events: none; background-image: linear-gradient(to right, rgba(255,255,255,.08) 1px, transparent 1px); background-size: 12.5% 100%;"></div>
 
     <div style="position: relative; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; padding: 0 40px 200px; max-width: 1560px; margin: 0 auto; pointer-events: none;">
-      <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 26px; overflow: hidden;">
-        <span style="display: inline-block; animation: rise .9s cubic-bezier(.2,.8,.2,1) .95s both; padding-bottom: .16em; margin-bottom: -.16em; font-family: var(--font-heading); font-size: 12.5px; letter-spacing: .34em; text-transform: uppercase; color: var(--color-accent-300);">Est. 1994 &nbsp;·&nbsp; 2,140 homes placed</span>
-      </div>
       <h1 style="margin: 0; font-family: var(--font-heading); font-weight: 600; font-size: clamp(52px, 8.2vw, 132px); line-height: .92; letter-spacing: -.015em; color: #fff; text-wrap: balance;">
-        <span style="display: block; overflow: hidden;"><span style="display: block; animation: rise 1s cubic-bezier(.2,.85,.2,1) 1.05s both; padding-bottom: .16em; margin-bottom: -.16em;">A house is a drawing</span></span>
-        <span style="display: block; overflow: hidden;"><span style="display: block; animation: rise 1s cubic-bezier(.2,.85,.2,1) 1.18s both; padding-bottom: .16em; margin-bottom: -.16em; color: var(--color-accent-300);">before it is a home.</span></span>
+        <span style="display: block; overflow: hidden;"><span style="display: block; animation: rise 1s cubic-bezier(.2,.85,.2,1) 1.05s both; padding-bottom: .16em; margin-bottom: -.16em;">Find a place</span></span>
+        <span style="display: block; overflow: hidden;"><span style="display: block; animation: rise 1s cubic-bezier(.2,.85,.2,1) 1.18s both; padding-bottom: .16em; margin-bottom: -.16em; color: var(--color-accent-300);">that feels home.</span></span>
       </h1>
-      <p style="margin: 28px 0 0; max-width: 46ch; font-size: 17px; line-height: 1.6; color: rgba(255,255,255,.72); animation: rise .9s ease 1.35s both;">Mixed residential across twelve metros — townhouses, single-family, lofts and land. Every listing surveyed, measured and photographed before it goes on the board.</p>
     </div>
 
     <div style="position: absolute; bottom: 44px; left: 50%; transform: translateX(-50%); animation: drift 2.6s ease-in-out infinite; display: flex; flex-direction: column; align-items: center; gap: 8px; pointer-events: none;">
@@ -217,60 +245,50 @@
       <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
       <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: var(--space-6); flex-wrap: wrap;">
         <div style="display: grid; grid-template-columns: repeat(4, minmax(150px, 1fr)); gap: 22px; flex: 1 1 620px;">
-          <div class="field"><label>Location</label><input class="input" value="Fairhaven, OR" /></div>
-          <div class="field"><label>Property type</label><input class="input" value="Any — mixed" /></div>
-          <div class="field"><label>Price ceiling</label><input class="input" value="$1,250,000" /></div>
-          <div class="field"><label>Beds</label><input class="input" value="3+" /></div>
+          <div class="field combo" data-combo data-key="location" data-options="Glastonbury|Rocky Hill|Newington|South Windsor|New Britain">
+            <label>Location</label>
+            <input class="input" placeholder="Town or street" autocomplete="off" />
+            <div class="combo-panel" data-open="false"></div>
+          </div>
+          <div class="field combo" data-combo data-key="type" data-options="Single-family|Multi-family|Townhouse|Condo|Waterfront|New build">
+            <label>Property type</label>
+            <input class="input" placeholder="Any" autocomplete="off" />
+            <div class="combo-panel" data-open="false"></div>
+          </div>
+          <div class="field combo" data-combo data-key="price" data-options="$400,000|$600,000|$800,000|$1,000,000|$1,500,000|$2,500,000">
+            <label>Price ceiling</label>
+            <input class="input" placeholder="No limit" autocomplete="off" />
+            <div class="combo-panel" data-open="false"></div>
+          </div>
+          <div class="field combo" data-combo data-key="beds" data-options="1+|2+|3+|4+|5+">
+            <label>Beds</label>
+            <input class="input" placeholder="Any" autocomplete="off" />
+            <div class="combo-panel" data-open="false"></div>
+          </div>
         </div>
-        <button class="btn btn-primary blueprint" style="height: 44px; padding: 0 30px; letter-spacing: .12em; text-transform: uppercase; font-size: 12.5px;">
-          <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>Search 1,482 homes
-        </button>
+        <div style="display: flex; gap: 10px;">
+          <button onClick="{{ onReset }}" class="btn btn-secondary" style="height: 44px; padding: 0 22px; letter-spacing: .12em; text-transform: uppercase; font-size: 12.5px;">Reset</button>
+          <button onClick="{{ onSearch }}" class="btn btn-primary blueprint" style="height: 44px; padding: 0 30px; letter-spacing: .12em; text-transform: uppercase; font-size: 12.5px;">
+            <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>Search
+          </button>
+        </div>
       </div>
       <div style="display: flex; align-items: center; gap: 10px; margin-top: 22px; flex-wrap: wrap;">
-        <span style="font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--color-neutral-600); margin-right: 4px;">Saved searches</span>
-        <span class="tag tag-outline">Waterfront</span>
-        <span class="tag tag-outline">New build</span>
-        <span class="tag tag-accent">Price drop · 34</span>
-        <span class="tag tag-outline">Open Sunday</span>
+        <span style="font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--color-neutral-600); margin-right: 4px;">Quick filters</span>
+        <span class="tag tag-outline quick" data-quick="type" data-quick-value="Waterfront">Waterfront</span>
+        <span class="tag tag-outline quick" data-quick="type" data-quick-value="New build">New build</span>
+        <span class="tag tag-outline quick" data-quick="type" data-quick-value="Multi-family">Multi-family</span>
+        <span class="tag tag-outline quick" data-quick="type" data-quick-value="Condo">Condo</span>
       </div>
     </div>
   </div>
-
-  <section style="margin-top: 88px; border-top: 1px solid var(--color-divider); border-bottom: 1px solid var(--color-divider); overflow: hidden; padding: 16px 0; background: var(--color-neutral-100);">
-    <div style="display: flex; width: max-content; animation: mq 34s linear infinite; font-family: var(--font-heading); font-size: 15px; letter-spacing: .2em; text-transform: uppercase; color: var(--color-neutral-600);">
-      <span style="display: flex; gap: 46px; padding-right: 46px;"><span>Fairhaven +4.2%</span><span style="color: var(--color-accent-700);">◆</span><span>Ridgemont 218 listings</span><span style="color: var(--color-accent-700);">◆</span><span>Alder Bay median $842k</span><span style="color: var(--color-accent-700);">◆</span><span>Cottonwood 11 new</span><span style="color: var(--color-accent-700);">◆</span><span>Larkspur Hill +1.8%</span><span style="color: var(--color-accent-700);">◆</span><span>Mill District median $529k</span><span style="color: var(--color-accent-700);">◆</span></span>
-      <span style="display: flex; gap: 46px; padding-right: 46px;"><span>Fairhaven +4.2%</span><span style="color: var(--color-accent-700);">◆</span><span>Ridgemont 218 listings</span><span style="color: var(--color-accent-700);">◆</span><span>Alder Bay median $842k</span><span style="color: var(--color-accent-700);">◆</span><span>Cottonwood 11 new</span><span style="color: var(--color-accent-700);">◆</span><span>Larkspur Hill +1.8%</span><span style="color: var(--color-accent-700);">◆</span><span>Mill District median $529k</span><span style="color: var(--color-accent-700);">◆</span></span>
-    </div>
-  </section>
-
-  <section style="max-width: 1360px; margin: 0 auto; padding: 78px 40px 20px;">
-    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--color-divider); border: 1px solid var(--color-divider);">
-      <div data-reveal style="background: var(--color-bg); padding: 34px 28px;">
-        <div style="font-family: var(--font-heading); font-weight: 600; font-size: 58px; line-height: 1; color: var(--color-accent-700);"><span data-count="2140">0</span></div>
-        <div style="margin-top: 10px; font-size: 12px; letter-spacing: .22em; text-transform: uppercase; color: var(--color-neutral-600);">Homes placed</div>
-      </div>
-      <div data-reveal style="background: var(--color-bg); padding: 34px 28px;">
-        <div style="font-family: var(--font-heading); font-weight: 600; font-size: 58px; line-height: 1; color: var(--color-accent-700);"><span data-count="12">0</span></div>
-        <div style="margin-top: 10px; font-size: 12px; letter-spacing: .22em; text-transform: uppercase; color: var(--color-neutral-600);">Metro markets</div>
-      </div>
-      <div data-reveal style="background: var(--color-bg); padding: 34px 28px;">
-        <div style="font-family: var(--font-heading); font-weight: 600; font-size: 58px; line-height: 1; color: var(--color-accent-700);"><span data-count="19">0</span><span style="font-size: 34px;"> days</span></div>
-        <div style="margin-top: 10px; font-size: 12px; letter-spacing: .22em; text-transform: uppercase; color: var(--color-neutral-600);">Median time to offer</div>
-      </div>
-      <div data-reveal style="background: var(--color-bg); padding: 34px 28px;">
-        <div style="font-family: var(--font-heading); font-weight: 600; font-size: 58px; line-height: 1; color: var(--color-accent-700);"><span data-count="98">0</span><span style="font-size: 34px;">%</span></div>
-        <div style="margin-top: 10px; font-size: 12px; letter-spacing: .22em; text-transform: uppercase; color: var(--color-neutral-600);">List-to-close rate</div>
-      </div>
-    </div>
-  </section>
 
   <section id="buy" style="max-width: 1360px; margin: 0 auto; padding: 84px 40px;">
     <div data-reveal style="display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-8); margin-bottom: 30px; flex-wrap: wrap;">
       <div>
         <div style="font-size: 11.5px; letter-spacing: .3em; text-transform: uppercase; color: var(--color-accent-700); margin-bottom: 12px;">01 — Categories</div>
-        <h2 style="margin: 0; font-family: var(--font-heading); font-weight: 600; font-size: clamp(34px, 4vw, 58px); line-height: 1; letter-spacing: -.01em;">Every kind of address</h2>
       </div>
-      <a href="#listings" onClick="{{ onNav }}" style="font-size: 13px; letter-spacing: .16em; text-transform: uppercase; border-bottom: 1px solid var(--color-accent-400); padding-bottom: 3px;">All 1,482 →</a>
+      <a href="#listings" onClick="{{ onNav }}" style="font-size: 13px; letter-spacing: .16em; text-transform: uppercase; border-bottom: 1px solid var(--color-accent-400); padding-bottom: 3px;">All listings →</a>
     </div>
     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
       <a href="#listings" onClick="{{ onNav }}" data-reveal data-lift class="blueprint" style="position: relative; display: block; aspect-ratio: 4/3.1; overflow: hidden; border: 1px solid var(--color-divider); color: inherit; transition: transform .5s cubic-bezier(.2,.8,.2,1), box-shadow .5s;">
@@ -299,18 +317,6 @@
       </a>
       <a href="#listings" onClick="{{ onNav }}" data-reveal data-lift class="blueprint" style="position: relative; display: block; aspect-ratio: 4/3.1; overflow: hidden; border: 1px solid var(--color-divider); color: inherit; transition: transform .5s cubic-bezier(.2,.8,.2,1), box-shadow .5s;">
         <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
-        <div data-zoom class="photoframe" style="position: absolute; inset: 0; transition: transform .8s cubic-bezier(.2,.8,.2,1);"><image-slot id="cat-3" shape="rect" fit="cover" src="houseimages/12.webp" placeholder="Loft / apartment interior"></image-slot></div>
-        <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(29,45,61,.9) 0%, rgba(29,45,61,.15) 62%); pointer-events: none;"></div>
-        <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 24px 26px; pointer-events: none; display: flex; align-items: flex-end; justify-content: space-between; gap: 12px;">
-          <div>
-            <div style="font-family: var(--font-heading); font-weight: 600; font-size: 28px; color: #fff; line-height: 1.05;">Lofts &amp; condos</div>
-            <div style="font-size: 12.5px; color: rgba(255,255,255,.66); margin-top: 4px;">from $269,000</div>
-          </div>
-          <div style="font-family: var(--font-heading); font-size: 15px; letter-spacing: .1em; color: var(--color-accent-300);">341</div>
-        </div>
-      </a>
-      <a href="#listings" onClick="{{ onNav }}" data-reveal data-lift class="blueprint" style="position: relative; display: block; aspect-ratio: 4/3.1; overflow: hidden; border: 1px solid var(--color-divider); color: inherit; transition: transform .5s cubic-bezier(.2,.8,.2,1), box-shadow .5s;">
-        <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
         <div data-zoom class="photoframe" style="position: absolute; inset: 0; transition: transform .8s cubic-bezier(.2,.8,.2,1);"><image-slot id="cat-4" shape="rect" fit="cover" src="houseimages/8.jpg" placeholder="Waterfront property"></image-slot></div>
         <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(29,45,61,.9) 0%, rgba(29,45,61,.15) 62%); pointer-events: none;"></div>
         <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 24px 26px; pointer-events: none; display: flex; align-items: flex-end; justify-content: space-between; gap: 12px;">
@@ -335,14 +341,24 @@
       </a>
       <a href="#listings" onClick="{{ onNav }}" data-reveal data-lift class="blueprint" style="position: relative; display: block; aspect-ratio: 4/3.1; overflow: hidden; border: 1px solid var(--color-divider); color: inherit; transition: transform .5s cubic-bezier(.2,.8,.2,1), box-shadow .5s;">
         <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
-        <div data-zoom class="photoframe" style="position: absolute; inset: 0; transition: transform .8s cubic-bezier(.2,.8,.2,1);"><image-slot id="cat-6" shape="rect" fit="cover" src="houseimages/7.jpg" placeholder="Open land / acreage"></image-slot></div>
+        <div data-zoom class="photoframe" style="position: absolute; inset: 0; transition: transform .8s cubic-bezier(.2,.8,.2,1);"><image-slot id="cat-3" shape="rect" fit="cover" src="houseimages/12.webp" placeholder="Multi-family exterior"></image-slot></div>
         <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(29,45,61,.9) 0%, rgba(29,45,61,.15) 62%); pointer-events: none;"></div>
         <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 24px 26px; pointer-events: none; display: flex; align-items: flex-end; justify-content: space-between; gap: 12px;">
           <div>
-            <div style="font-family: var(--font-heading); font-weight: 600; font-size: 28px; color: #fff; line-height: 1.05;">Land &amp; lots</div>
-            <div style="font-size: 12.5px; color: rgba(255,255,255,.66); margin-top: 4px;">from $96,000</div>
+            <div style="font-family: var(--font-heading); font-weight: 600; font-size: 28px; color: #fff; line-height: 1.05;">Multi-family</div>
+            <div style="font-size: 12.5px; color: rgba(255,255,255,.66); margin-top: 4px;">Two, three and four unit</div>
           </div>
-          <div style="font-family: var(--font-heading); font-size: 15px; letter-spacing: .1em; color: var(--color-accent-300);">42</div>
+        </div>
+      </a>
+      <a href="#listings" onClick="{{ onNav }}" data-reveal data-lift class="blueprint" style="position: relative; display: block; aspect-ratio: 4/3.1; overflow: hidden; border: 1px solid var(--color-divider); color: inherit; transition: transform .5s cubic-bezier(.2,.8,.2,1), box-shadow .5s;">
+        <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+        <div data-zoom class="photoframe" style="position: absolute; inset: 0; transition: transform .8s cubic-bezier(.2,.8,.2,1);"><image-slot id="cat-6" shape="rect" fit="cover" src="houseimages/6.jpg" placeholder="Condominium exterior"></image-slot></div>
+        <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(29,45,61,.9) 0%, rgba(29,45,61,.15) 62%); pointer-events: none;"></div>
+        <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 24px 26px; pointer-events: none; display: flex; align-items: flex-end; justify-content: space-between; gap: 12px;">
+          <div>
+            <div style="font-family: var(--font-heading); font-weight: 600; font-size: 28px; color: #fff; line-height: 1.05;">Condos</div>
+            <div style="font-size: 12.5px; color: rgba(255,255,255,.66); margin-top: 4px;">Low maintenance, move-in ready</div>
+          </div>
         </div>
       </a>
     </div>
@@ -353,6 +369,7 @@
       <div>
         <div style="font-size: 11.5px; letter-spacing: .3em; text-transform: uppercase; color: var(--color-accent-700); margin-bottom: 12px;">02 — Featured</div>
         <h2 style="margin: 0; font-family: var(--font-heading); font-weight: 600; font-size: clamp(34px, 4vw, 58px); line-height: 1; letter-spacing: -.01em;">On the board this week</h2>
+        <div data-search-result style="margin-top: 12px; font-size: 12.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--color-accent-700);"></div>
       </div>
       <div class="seg" style="align-self: center;">
         <span class="seg-opt" data-active="true">All</span>
@@ -363,14 +380,14 @@
     </div>
 
     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px;">
-      <article data-reveal data-lift class="card blueprint" style="padding: 0; overflow: hidden; transition: transform .5s cubic-bezier(.2,.8,.2,1), box-shadow .5s;">
+      <article data-listing data-loc="glastonbury 41 alder row" data-type="single-family house" data-price="865000" data-beds="4" data-reveal data-lift class="card blueprint" style="padding: 0; overflow: hidden; transition: transform .5s cubic-bezier(.2,.8,.2,1), box-shadow .5s;">
         <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
         <div style="position: relative; aspect-ratio: 3/2; overflow: hidden; border-bottom: 1px solid var(--color-divider);">
           <div data-zoom class="photoframe" style="position: absolute; inset: 0; transition: transform .8s cubic-bezier(.2,.8,.2,1);"><image-slot id="lst-1" shape="rect" fit="cover" src="houseimages/3.jpg" placeholder="Listing photo — 41 Alder Row"></image-slot></div>
           <span class="tag tag-accent" style="position: absolute; top: 14px; left: 14px;">New</span>
         </div>
         <div style="padding: 22px 24px 24px;">
-          <div class="card-kicker" style="letter-spacing: .22em;">Fairhaven · MLS 40218</div>
+          <div class="card-kicker" style="letter-spacing: .22em;">Glastonbury · MLS 40218</div>
           <h3 class="card-title" style="margin: 8px 0 0; font-size: 26px;">41 Alder Row</h3>
           <div style="display: flex; align-items: baseline; gap: 10px; margin-top: 12px;">
             <span style="font-family: var(--font-heading); font-weight: 600; font-size: 30px; color: var(--color-accent-700);">$865,000</span>
@@ -382,14 +399,14 @@
         </div>
       </article>
 
-      <article data-reveal data-lift class="card blueprint" style="padding: 0; overflow: hidden; transition: transform .5s cubic-bezier(.2,.8,.2,1), box-shadow .5s;">
+      <article data-listing data-loc="rocky hill 7 mill yard" data-type="condo apartment" data-price="529000" data-beds="2" data-reveal data-lift class="card blueprint" style="padding: 0; overflow: hidden; transition: transform .5s cubic-bezier(.2,.8,.2,1), box-shadow .5s;">
         <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
         <div style="position: relative; aspect-ratio: 3/2; overflow: hidden; border-bottom: 1px solid var(--color-divider);">
           <div data-zoom class="photoframe" style="position: absolute; inset: 0; transition: transform .8s cubic-bezier(.2,.8,.2,1);"><image-slot id="lst-2" shape="rect" fit="cover" src="houseimages/10.webp" placeholder="Listing photo — 7 Mill Yard"></image-slot></div>
           <span class="tag tag-outline" style="position: absolute; top: 14px; left: 14px; background: var(--color-bg);">Price drop</span>
         </div>
         <div style="padding: 22px 24px 24px;">
-          <div class="card-kicker" style="letter-spacing: .22em;">Mill District · MLS 39774</div>
+          <div class="card-kicker" style="letter-spacing: .22em;">Rocky Hill · MLS 39774</div>
           <h3 class="card-title" style="margin: 8px 0 0; font-size: 26px;">7 Mill Yard, Unit 4B</h3>
           <div style="display: flex; align-items: baseline; gap: 10px; margin-top: 12px;">
             <span style="font-family: var(--font-heading); font-weight: 600; font-size: 30px; color: var(--color-accent-700);">$529,000</span>
@@ -401,13 +418,13 @@
         </div>
       </article>
 
-      <article data-reveal data-lift class="card blueprint" style="padding: 0; overflow: hidden; transition: transform .5s cubic-bezier(.2,.8,.2,1), box-shadow .5s;">
+      <article data-listing data-loc="south windsor 12 larkspur ridge" data-type="single-family house new build" data-price="1240000" data-beds="5" data-reveal data-lift class="card blueprint" style="padding: 0; overflow: hidden; transition: transform .5s cubic-bezier(.2,.8,.2,1), box-shadow .5s;">
         <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
         <div style="position: relative; aspect-ratio: 3/2; overflow: hidden; border-bottom: 1px solid var(--color-divider);">
           <div data-zoom class="photoframe" style="position: absolute; inset: 0; transition: transform .8s cubic-bezier(.2,.8,.2,1);"><image-slot id="lst-3" shape="rect" fit="cover" src="houseimages/11.jpg" placeholder="Listing photo — 12 Larkspur Ridge"></image-slot></div>
         </div>
         <div style="padding: 22px 24px 24px;">
-          <div class="card-kicker" style="letter-spacing: .22em;">Larkspur Hill · MLS 40361</div>
+          <div class="card-kicker" style="letter-spacing: .22em;">South Windsor · MLS 40361</div>
           <h3 class="card-title" style="margin: 8px 0 0; font-size: 26px;">12 Larkspur Ridge</h3>
           <div style="display: flex; align-items: baseline; gap: 10px; margin-top: 12px;">
             <span style="font-family: var(--font-heading); font-weight: 600; font-size: 30px; color: var(--color-accent-700);">$1,240,000</span>
@@ -419,13 +436,13 @@
         </div>
       </article>
 
-      <article data-reveal data-lift class="card blueprint" style="padding: 0; overflow: hidden; transition: transform .5s cubic-bezier(.2,.8,.2,1), box-shadow .5s;">
+      <article data-listing data-loc="newington 88 cottonwood lane" data-type="single-family house" data-price="412000" data-beds="3" data-reveal data-lift class="card blueprint" style="padding: 0; overflow: hidden; transition: transform .5s cubic-bezier(.2,.8,.2,1), box-shadow .5s;">
         <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
         <div style="position: relative; aspect-ratio: 3/2; overflow: hidden; border-bottom: 1px solid var(--color-divider);">
           <div data-zoom class="photoframe" style="position: absolute; inset: 0; transition: transform .8s cubic-bezier(.2,.8,.2,1);"><image-slot id="lst-4" shape="rect" fit="cover" src="houseimages/6.jpg" placeholder="Listing photo — 88 Cottonwood Lane"></image-slot></div>
         </div>
         <div style="padding: 22px 24px 24px;">
-          <div class="card-kicker" style="letter-spacing: .22em;">Cottonwood · MLS 40122</div>
+          <div class="card-kicker" style="letter-spacing: .22em;">Newington · MLS 40122</div>
           <h3 class="card-title" style="margin: 8px 0 0; font-size: 26px;">88 Cottonwood Lane</h3>
           <div style="display: flex; align-items: baseline; gap: 10px; margin-top: 12px;">
             <span style="font-family: var(--font-heading); font-weight: 600; font-size: 30px; color: var(--color-accent-700);">$412,000</span>
@@ -437,14 +454,14 @@
         </div>
       </article>
 
-      <article data-reveal data-lift class="card blueprint" style="padding: 0; overflow: hidden; transition: transform .5s cubic-bezier(.2,.8,.2,1), box-shadow .5s;">
+      <article data-listing data-loc="glastonbury 3 harbour point" data-type="waterfront house" data-price="2150000" data-beds="4" data-reveal data-lift class="card blueprint" style="padding: 0; overflow: hidden; transition: transform .5s cubic-bezier(.2,.8,.2,1), box-shadow .5s;">
         <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
         <div style="position: relative; aspect-ratio: 3/2; overflow: hidden; border-bottom: 1px solid var(--color-divider);">
           <div data-zoom class="photoframe" style="position: absolute; inset: 0; transition: transform .8s cubic-bezier(.2,.8,.2,1);"><image-slot id="lst-5" shape="rect" fit="cover" src="houseimages/12.webp" placeholder="Listing photo — 3 Harbour Point"></image-slot></div>
           <span class="tag tag-accent" style="position: absolute; top: 14px; left: 14px;">Waterfront</span>
         </div>
         <div style="padding: 22px 24px 24px;">
-          <div class="card-kicker" style="letter-spacing: .22em;">Alder Bay · MLS 39980</div>
+          <div class="card-kicker" style="letter-spacing: .22em;">Glastonbury · MLS 39980</div>
           <h3 class="card-title" style="margin: 8px 0 0; font-size: 26px;">3 Harbour Point</h3>
           <div style="display: flex; align-items: baseline; gap: 10px; margin-top: 12px;">
             <span style="font-family: var(--font-heading); font-weight: 600; font-size: 30px; color: var(--color-accent-700);">$2,150,000</span>
@@ -456,13 +473,13 @@
         </div>
       </article>
 
-      <article data-reveal data-lift class="card blueprint" style="padding: 0; overflow: hidden; transition: transform .5s cubic-bezier(.2,.8,.2,1), box-shadow .5s;">
+      <article data-listing data-loc="new britain 214 ridgemont ave" data-type="townhouse" data-price="684000" data-beds="3" data-reveal data-lift class="card blueprint" style="padding: 0; overflow: hidden; transition: transform .5s cubic-bezier(.2,.8,.2,1), box-shadow .5s;">
         <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
         <div style="position: relative; aspect-ratio: 3/2; overflow: hidden; border-bottom: 1px solid var(--color-divider);">
           <div data-zoom class="photoframe" style="position: absolute; inset: 0; transition: transform .8s cubic-bezier(.2,.8,.2,1);"><image-slot id="lst-6" shape="rect" fit="cover" src="houseimages/5.jpg" placeholder="Listing photo — 214 Ridgemont Ave"></image-slot></div>
         </div>
         <div style="padding: 22px 24px 24px;">
-          <div class="card-kicker" style="letter-spacing: .22em;">Ridgemont · MLS 40405</div>
+          <div class="card-kicker" style="letter-spacing: .22em;">New Britain · MLS 40405</div>
           <h3 class="card-title" style="margin: 8px 0 0; font-size: 26px;">214 Ridgemont Ave</h3>
           <div style="display: flex; align-items: baseline; gap: 10px; margin-top: 12px;">
             <span style="font-family: var(--font-heading); font-weight: 600; font-size: 30px; color: var(--color-accent-700);">$684,000</span>
@@ -480,46 +497,52 @@
     <div style="max-width: 1360px; margin: 0 auto; padding: 0 40px;">
       <div data-reveal style="margin-bottom: 34px;">
         <div style="font-size: 11.5px; letter-spacing: .3em; text-transform: uppercase; color: var(--color-accent-300); margin-bottom: 12px;">03 — Neighborhoods</div>
-        <h2 style="margin: 0; font-family: var(--font-heading); font-weight: 600; font-size: clamp(34px, 4vw, 58px); line-height: 1; letter-spacing: -.01em; color: #fff;">Where the lines are drawn</h2>
+        <h2 style="margin: 0; font-family: var(--font-heading); font-weight: 600; font-size: clamp(34px, 4vw, 58px); line-height: 1; letter-spacing: -.01em; color: #fff;">Neighborhoods</h2>
       </div>
       <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px;">
         <a href="#listings" onClick="{{ onNav }}" data-reveal data-lift style="display: block; color: inherit; border: 1px solid rgba(255,255,255,.18); transition: transform .5s cubic-bezier(.2,.8,.2,1), border-color .4s;">
           <div data-mask style="position: relative; aspect-ratio: 16/10; overflow: hidden;">
-            <div data-zoom class="photoframe" style="position: absolute; inset: 0; transition: transform .8s cubic-bezier(.2,.8,.2,1);"><image-slot id="area-1" shape="rect" fit="cover" src="houseimages/6.jpg" placeholder="Fairhaven streetscape"></image-slot></div>
+            <div data-zoom class="photoframe" style="position: absolute; inset: 0; transition: transform .8s cubic-bezier(.2,.8,.2,1);"><image-slot id="area-1" shape="rect" fit="cover" src="houseimages/6.jpg" placeholder="Glastonbury CT"></image-slot></div>
           </div>
-          <div style="padding: 24px 26px 26px;">
-            <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 10px;">
-              <h3 style="margin: 0; font-family: var(--font-heading); font-weight: 600; font-size: 27px; color: #fff;">Fairhaven</h3>
-              <span style="font-size: 12.5px; color: var(--color-accent-300);">+4.2% yr</span>
-            </div>
-            <p style="margin: 12px 0 0; font-size: 14.5px; line-height: 1.6; color: rgba(255,255,255,.62);">Gridded 1920s blocks, deep porches, two elementary schools inside a ten-minute walk.</p>
-            <div style="margin-top: 18px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.16); font-size: 13px; color: rgba(255,255,255,.8);">Median $842,000 · 218 listings</div>
+          <div style="padding: 22px 26px 24px;">
+            <h3 style="margin: 0; font-family: var(--font-heading); font-weight: 600; font-size: 27px; color: #fff;">Glastonbury</h3>
+            <div style="margin-top: 6px; font-size: 12.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--color-accent-300);">Connecticut</div>
           </div>
         </a>
         <a href="#listings" onClick="{{ onNav }}" data-reveal data-lift style="display: block; color: inherit; border: 1px solid rgba(255,255,255,.18); transition: transform .5s cubic-bezier(.2,.8,.2,1), border-color .4s;">
           <div data-mask style="position: relative; aspect-ratio: 16/10; overflow: hidden;">
-            <div data-zoom class="photoframe" style="position: absolute; inset: 0; transition: transform .8s cubic-bezier(.2,.8,.2,1);"><image-slot id="area-2" shape="rect" fit="cover" src="houseimages/10.webp" placeholder="Mill District warehouse conversions"></image-slot></div>
+            <div data-zoom class="photoframe" style="position: absolute; inset: 0; transition: transform .8s cubic-bezier(.2,.8,.2,1);"><image-slot id="area-2" shape="rect" fit="cover" src="houseimages/10.webp" placeholder="Rocky Hill CT"></image-slot></div>
           </div>
-          <div style="padding: 24px 26px 26px;">
-            <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 10px;">
-              <h3 style="margin: 0; font-family: var(--font-heading); font-weight: 600; font-size: 27px; color: #fff;">Mill District</h3>
-              <span style="font-size: 12.5px; color: var(--color-accent-300);">+2.6% yr</span>
-            </div>
-            <p style="margin: 12px 0 0; font-size: 14.5px; line-height: 1.6; color: rgba(255,255,255,.62);">Brick conversions on the old rail spur. Highest share of one- and two-bedroom stock in the city.</p>
-            <div style="margin-top: 18px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.16); font-size: 13px; color: rgba(255,255,255,.8);">Median $529,000 · 164 listings</div>
+          <div style="padding: 22px 26px 24px;">
+            <h3 style="margin: 0; font-family: var(--font-heading); font-weight: 600; font-size: 27px; color: #fff;">Rocky Hill</h3>
+            <div style="margin-top: 6px; font-size: 12.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--color-accent-300);">Connecticut</div>
           </div>
         </a>
         <a href="#listings" onClick="{{ onNav }}" data-reveal data-lift style="display: block; color: inherit; border: 1px solid rgba(255,255,255,.18); transition: transform .5s cubic-bezier(.2,.8,.2,1), border-color .4s;">
           <div data-mask style="position: relative; aspect-ratio: 16/10; overflow: hidden;">
-            <div data-zoom class="photoframe" style="position: absolute; inset: 0; transition: transform .8s cubic-bezier(.2,.8,.2,1);"><image-slot id="area-3" shape="rect" fit="cover" src="houseimages/12.webp" placeholder="Alder Bay waterfront"></image-slot></div>
+            <div data-zoom class="photoframe" style="position: absolute; inset: 0; transition: transform .8s cubic-bezier(.2,.8,.2,1);"><image-slot id="area-3" shape="rect" fit="cover" src="houseimages/12.webp" placeholder="Newington CT"></image-slot></div>
           </div>
-          <div style="padding: 24px 26px 26px;">
-            <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 10px;">
-              <h3 style="margin: 0; font-family: var(--font-heading); font-weight: 600; font-size: 27px; color: #fff;">Alder Bay</h3>
-              <span style="font-size: 12.5px; color: var(--color-accent-300);">+6.1% yr</span>
-            </div>
-            <p style="margin: 12px 0 0; font-size: 14.5px; line-height: 1.6; color: rgba(255,255,255,.62);">Twelve kilometres of shoreline, tight supply, and the longest average hold in the portfolio.</p>
-            <div style="margin-top: 18px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.16); font-size: 13px; color: rgba(255,255,255,.8);">Median $1,410,000 · 76 listings</div>
+          <div style="padding: 22px 26px 24px;">
+            <h3 style="margin: 0; font-family: var(--font-heading); font-weight: 600; font-size: 27px; color: #fff;">Newington</h3>
+            <div style="margin-top: 6px; font-size: 12.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--color-accent-300);">Connecticut</div>
+          </div>
+        </a>
+        <a href="#listings" onClick="{{ onNav }}" data-reveal data-lift style="display: block; color: inherit; border: 1px solid rgba(255,255,255,.18); transition: transform .5s cubic-bezier(.2,.8,.2,1), border-color .4s;">
+          <div data-mask style="position: relative; aspect-ratio: 16/10; overflow: hidden;">
+            <div data-zoom class="photoframe" style="position: absolute; inset: 0; transition: transform .8s cubic-bezier(.2,.8,.2,1);"><image-slot id="area-4" shape="rect" fit="cover" src="houseimages/5.jpg" placeholder="South Windsor CT"></image-slot></div>
+          </div>
+          <div style="padding: 22px 26px 24px;">
+            <h3 style="margin: 0; font-family: var(--font-heading); font-weight: 600; font-size: 27px; color: #fff;">South Windsor</h3>
+            <div style="margin-top: 6px; font-size: 12.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--color-accent-300);">Connecticut</div>
+          </div>
+        </a>
+        <a href="#listings" onClick="{{ onNav }}" data-reveal data-lift style="display: block; color: inherit; border: 1px solid rgba(255,255,255,.18); transition: transform .5s cubic-bezier(.2,.8,.2,1), border-color .4s;">
+          <div data-mask style="position: relative; aspect-ratio: 16/10; overflow: hidden;">
+            <div data-zoom class="photoframe" style="position: absolute; inset: 0; transition: transform .8s cubic-bezier(.2,.8,.2,1);"><image-slot id="area-5" shape="rect" fit="cover" src="houseimages/3.jpg" placeholder="New Britain CT"></image-slot></div>
+          </div>
+          <div style="padding: 22px 26px 24px;">
+            <h3 style="margin: 0; font-family: var(--font-heading); font-weight: 600; font-size: 27px; color: #fff;">New Britain</h3>
+            <div style="margin-top: 6px; font-size: 12.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--color-accent-300);">Connecticut</div>
           </div>
         </a>
       </div>
@@ -610,7 +633,6 @@
   <section id="agent" style="max-width: 1360px; margin: 0 auto; padding: 96px 40px;">
     <div data-reveal style="margin-bottom: 34px;">
       <div style="font-size: 11.5px; letter-spacing: .3em; text-transform: uppercase; color: var(--color-accent-700); margin-bottom: 12px;">07 — The desk</div>
-      <h2 style="margin: 0; font-family: var(--font-heading); font-weight: 600; font-size: clamp(34px, 4vw, 58px); line-height: 1; letter-spacing: -.01em;">One realtor, every address</h2>
     </div>
     <div data-reveal data-lift class="card blueprint" style="padding: 0; overflow: hidden; display: grid; grid-template-columns: 380px 1fr; transition: transform .5s cubic-bezier(.2,.8,.2,1), box-shadow .5s;">
       <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
@@ -620,21 +642,7 @@
       <div style="padding: 44px 46px 40px; display: flex; flex-direction: column;">
         <div style="font-size: 11.5px; letter-spacing: .3em; text-transform: uppercase; color: var(--color-accent-700);">Lead realtor · Licensed CT</div>
         <h3 style="margin: 14px 0 0; font-family: var(--font-heading); font-weight: 600; font-size: clamp(38px, 3.4vw, 54px); line-height: 1;">Kavitha Sathya</h3>
-        <p style="margin: 18px 0 0; max-width: 52ch; font-size: 16px; line-height: 1.65; color: var(--color-neutral-700);">Handles every listing on the board personally — valuation, survey, photography brief, showings and closing. Buyers and sellers both come through the same desk, so nothing is handed off mid-deal.</p>
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--color-divider); border: 1px solid var(--color-divider); margin-top: 30px;">
-          <div style="background: var(--color-bg); padding: 20px 22px;">
-            <div style="font-family: var(--font-heading); font-weight: 600; font-size: 34px; line-height: 1; color: var(--color-accent-700);">184</div>
-            <div style="margin-top: 6px; font-size: 11.5px; letter-spacing: .2em; text-transform: uppercase; color: var(--color-neutral-600);">Closings</div>
-          </div>
-          <div style="background: var(--color-bg); padding: 20px 22px;">
-            <div style="font-family: var(--font-heading); font-weight: 600; font-size: 34px; line-height: 1; color: var(--color-accent-700);">14</div>
-            <div style="margin-top: 6px; font-size: 11.5px; letter-spacing: .2em; text-transform: uppercase; color: var(--color-neutral-600);">Years</div>
-          </div>
-          <div style="background: var(--color-bg); padding: 20px 22px;">
-            <div style="font-family: var(--font-heading); font-weight: 600; font-size: 34px; line-height: 1; color: var(--color-accent-700);">19<span style="font-size: 20px;"> d</span></div>
-            <div style="margin-top: 6px; font-size: 11.5px; letter-spacing: .2em; text-transform: uppercase; color: var(--color-neutral-600);">Median to offer</div>
-          </div>
-        </div>
+        <p style="margin: 18px 0 0; max-width: 52ch; font-size: 16px; line-height: 1.65; color: var(--color-neutral-700);">Handles every listing on the board personally — valuation, survey, photography brief, showings and closing.</p>
         <div style="display: flex; gap: 14px; margin-top: 30px; flex-wrap: wrap;">
           <a href="Kavitha Sathya.dc.html" class="btn btn-primary blueprint" style="letter-spacing: .12em; text-transform: uppercase; font-size: 12.5px;">
             <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>Contact Kavitha
@@ -673,24 +681,28 @@
     </div>
     <div style="position: relative; max-width: 1360px; margin: 0 auto; padding: 100px 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;">
       <div data-reveal>
-        <h2 style="margin: 0; font-family: var(--font-heading); font-weight: 600; font-size: clamp(38px, 4.6vw, 66px); line-height: .98; letter-spacing: -.015em; color: #fff;">Book a viewing.<br />We bring the survey.</h2>
+        <h2 style="margin: 0; font-family: var(--font-heading); font-weight: 600; font-size: clamp(38px, 4.6vw, 66px); line-height: .98; letter-spacing: -.015em; color: #fff;">Book a viewing.</h2>
         <p style="margin: 22px 0 0; max-width: 42ch; font-size: 16.5px; line-height: 1.65; color: rgba(255,255,255,.68);">Tell us the district and the ceiling. An agent replies within one business day with three matched addresses.</p>
-        <div style="margin-top: 32px; display: flex; gap: 34px; font-size: 13px; letter-spacing: .16em; text-transform: uppercase; color: var(--color-accent-300);">
-          <span>+1 503 555 0148</span><span>kavitha@amazingcthomes.com</span>
+        <div style="margin-top: 32px; display: flex; gap: 34px; flex-wrap: wrap; font-size: 13px; letter-spacing: .16em; text-transform: uppercase; color: var(--color-accent-300);">
+          <a href="tel:+16175134321" style="color: inherit;">+1 617 513 4321</a><a href="mailto:realksathya24@gmail.com" style="color: inherit; text-transform: none; letter-spacing: .08em;">realksathya24@gmail.com</a>
         </div>
       </div>
       <form data-reveal class="card blueprint" onSubmit="{{ onSubmit }}" style="background: var(--color-bg); padding: 34px 32px 36px; box-shadow: var(--shadow-lg);">
         <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-          <div class="field"><label>Full name</label><input class="input" placeholder="Your name" /></div>
-          <div class="field"><label>Email</label><input class="input" placeholder="you@email.com" /></div>
-          <div class="field"><label>District</label><input class="input" placeholder="Fairhaven" /></div>
-          <div class="field"><label>Budget ceiling</label><input class="input" placeholder="$900,000" /></div>
+          <div class="field"><label>Full name</label><input class="input" name="name" placeholder="Your name" /></div>
+          <div class="field"><label>Email</label><input class="input" name="email" type="email" placeholder="you@email.com" /></div>
+          <div class="field"><label>Town</label><input class="input" name="district" placeholder="Glastonbury" /></div>
+          <div class="field"><label>Budget ceiling</label><input class="input" name="budget" placeholder="$900,000" /></div>
         </div>
-        <div class="field" style="margin-top: 20px;"><label>What are you looking for?</label><input class="input" placeholder="Three bedrooms, garden, walkable to school" /></div>
+        <div class="field" style="margin-top: 20px;"><label>What are you looking for?</label><input class="input" name="message" placeholder="Three bedrooms, garden, walkable to school" /></div>
+        <!-- Spam trap. Hidden from people, filled in by bots; the API drops
+             any submission that has a value here. -->
+        <input type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true" style="position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0;" />
         <button type="submit" class="btn btn-primary btn-block blueprint" style="margin-top: 26px; letter-spacing: .12em; text-transform: uppercase; font-size: 12.5px;">
           <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>{{ submitLabel }}
         </button>
+        <div style="margin-top: 12px; font-size: 13px; color: #b4463c; min-height: 1em;">{{ sendMsg }}</div>
       </form>
     </div>
   </section>
@@ -723,7 +735,7 @@
         </div>
       </div>
       <div style="margin-top: 52px; padding-top: 22px; border-top: 1px solid rgba(255,255,255,.14); display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.45);">
-        <span>© 2026 amazingcthomes — sample mockup</span><span>DRE #01948225</span>
+        <span>© 2026 amazingcthomes</span><span>DRE #01948225</span>
       </div>
     </div>
   </footer>
@@ -731,7 +743,17 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{}">
 class Component extends DCLogic {
-  state = { price: 865000, down: 20, rate: 6.4, years: 30, sent: false };
+  state = { price: 865000, down: 20, rate: 6.4, years: 30, sendState: "idle", sendMsg: "" };
+
+  // ── Lead delivery ─────────────────────────────────────────────────
+  // Posts to our own serverless function at api/lead.js, which relays the
+  // enquiry by email. The API key lives in a Vercel environment variable,
+  // never here — anything in this file is readable by every visitor.
+  //
+  // Set leadEndpoint to "" to fall back to opening the visitor's mail
+  // client instead. Useful for local testing, where there is no function.
+  leadEndpoint = "/api/lead";
+  leadEmail = "realksathya24@gmail.com";
 
   constructor(p) {
     super(p);
@@ -747,9 +769,265 @@ class Component extends DCLogic {
     return "$" + Math.round(n).toLocaleString("en-US");
   }
 
+  // Reads a search field's current value straight from the DOM. The four
+  // inputs are deliberately uncontrolled: the mortgage sliders re-render
+  // this component on every drag, and routing the search boxes through
+  // React state made them fight that re-render.
+  fieldValue(key) {
+    const root = this.rootRef.current;
+    if (!root) return "";
+    const el = root.querySelector('[data-combo][data-key="' + key + '"] input');
+    return el ? el.value : "";
+  }
+
+  setFieldValue(key, value) {
+    const root = this.rootRef.current;
+    if (!root) return;
+    const el = root.querySelector('[data-combo][data-key="' + key + '"] input');
+    if (el) el.value = value;
+  }
+
+  // Turns every [data-combo] field into a combobox. Clicking opens the
+  // FULL option list no matter what is already in the box; typing narrows
+  // it; any free-text value the user types is still honoured by the
+  // filter. The first entry clears the field.
+  buildCombos(root) {
+    const combos = Array.from(root.querySelectorAll("[data-combo]"));
+
+    const closeAll = (except) => {
+      combos.forEach((c) => {
+        if (c === except) return;
+        const p = c.querySelector(".combo-panel");
+        if (p) p.setAttribute("data-open", "false");
+      });
+    };
+
+    combos.forEach((field) => {
+      const input = field.querySelector("input");
+      const panel = field.querySelector(".combo-panel");
+      const options = (field.getAttribute("data-options") || "").split("|").filter(Boolean);
+      if (!input || !panel) return;
+
+      const addOpt = (label, value, isAny) => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "combo-opt";
+        if (isAny) b.setAttribute("data-any", "true");
+        b.textContent = label;
+        // mousedown, not click: the input's blur would close the panel
+        // before a click event could ever land.
+        b.addEventListener("mousedown", (e) => {
+          e.preventDefault();
+          input.value = value;
+          panel.setAttribute("data-open", "false");
+          this.runSearch();
+        });
+        panel.appendChild(b);
+      };
+
+      const render = (filter) => {
+        const f = (filter || "").trim().toLowerCase();
+        const list = f ? options.filter((o) => o.toLowerCase().indexOf(f) !== -1) : options;
+        panel.innerHTML = "";
+        addOpt("Any — clear this field", "", true);
+        list.forEach((o) => addOpt(o, o, false));
+      };
+
+      const open = () => {
+        closeAll(field);
+        render("");
+        panel.setAttribute("data-open", "true");
+      };
+
+      input.addEventListener("focus", open);
+      input.addEventListener("click", open);
+      input.addEventListener("input", () => {
+        render(input.value);
+        panel.setAttribute("data-open", "true");
+      });
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          panel.setAttribute("data-open", "false");
+          input.blur();
+        } else if (e.key === "Enter") {
+          e.preventDefault();
+          panel.setAttribute("data-open", "false");
+          input.blur();
+          this.runSearch();
+        }
+      });
+      input.addEventListener("blur", () => {
+        window.setTimeout(() => panel.setAttribute("data-open", "false"), 130);
+      });
+    });
+
+    // Quick-filter chips write into a field and search immediately.
+    root.querySelectorAll("[data-quick]").forEach((chip) => {
+      chip.addEventListener("click", () => {
+        const key = chip.getAttribute("data-quick");
+        const value = chip.getAttribute("data-quick-value") || "";
+        // Clicking an active chip turns it back off.
+        this.setFieldValue(key, this.fieldValue(key) === value ? "" : value);
+        this.syncChips();
+        this.runSearch();
+      });
+    });
+
+    this.onDocClick = (e) => {
+      if (!e.target || !e.target.closest || !e.target.closest("[data-combo]")) closeAll(null);
+    };
+    document.addEventListener("click", this.onDocClick);
+  }
+
+  // Chips show as filled when their value is the one in play.
+  syncChips() {
+    const root = this.rootRef.current;
+    if (!root) return;
+    root.querySelectorAll("[data-quick]").forEach((chip) => {
+      const on = this.fieldValue(chip.getAttribute("data-quick")) === chip.getAttribute("data-quick-value");
+      chip.className = "tag quick " + (on ? "tag-accent" : "tag-outline");
+    });
+  }
+
+  resetSearch() {
+    const root = this.rootRef.current;
+    if (!root) return;
+    root.querySelectorAll("[data-combo] input").forEach((i) => { i.value = ""; });
+    this.syncChips();
+    this.runSearch(true);
+  }
+
+  // Filters the listing cards. Every field is optional and they combine,
+  // so Beds alone, or Location + Price, both work. Price is a ceiling,
+  // Beds is a floor, Location and Type are substring matches.
+  runSearch(skipScroll) {
+    const root = this.rootRef.current;
+    if (!root) return;
+
+    const loc = this.fieldValue("location").trim().toLowerCase();
+    const type = this.fieldValue("type").trim().toLowerCase();
+    const maxPrice = parseInt(this.fieldValue("price").replace(/[^0-9]/g, ""), 10);
+    const minBeds = parseInt(this.fieldValue("beds").replace(/[^0-9]/g, ""), 10);
+    const active = !!loc || !!type || Number.isFinite(maxPrice) || Number.isFinite(minBeds);
+
+    let shown = 0;
+    let total = 0;
+    root.querySelectorAll("[data-listing]").forEach((el) => {
+      total++;
+      const elLoc = (el.getAttribute("data-loc") || "").toLowerCase();
+      const elType = (el.getAttribute("data-type") || "").toLowerCase();
+      const elPrice = parseInt(el.getAttribute("data-price"), 10);
+      const elBeds = parseInt(el.getAttribute("data-beds"), 10);
+
+      const match =
+        (!loc || elLoc.indexOf(loc) !== -1) &&
+        (!type || elType.indexOf(type) !== -1) &&
+        (!Number.isFinite(maxPrice) || !Number.isFinite(elPrice) || elPrice <= maxPrice) &&
+        (!Number.isFinite(minBeds) || !Number.isFinite(elBeds) || elBeds >= minBeds);
+
+      el.style.display = match ? "" : "none";
+      if (match) shown++;
+    });
+
+    const out = root.querySelector("[data-search-result]");
+    if (out) {
+      out.textContent = !active
+        ? ""
+        : shown === 0
+          ? "No listings match — try Reset, or widen one field"
+          : "Showing " + shown + " of " + total + " listings";
+    }
+
+    this.syncChips();
+
+    if (skipScroll) return;
+    const target = document.getElementById("listings");
+    if (target) {
+      window.scrollTo({
+        top: target.getBoundingClientRect().top + window.scrollY - 78,
+        behavior: "smooth"
+      });
+    }
+  }
+
+  // Collects the named fields of the submitted form and delivers them.
+  sendLead(e) {
+    e.preventDefault();
+    if (this.state.sendState === "sending") return;
+
+    const form = e.currentTarget;
+    const get = (n) => {
+      const el = form.querySelector('[name="' + n + '"]');
+      if (!el) return "";
+      return el.type === "checkbox" ? (el.checked ? "Yes" : "No") : el.value.trim();
+    };
+
+    const data = {
+      name: get("name"),
+      email: get("email"),
+      phone: get("phone"),
+      town: get("district"),
+      budget: get("budget"),
+      message: get("message"),
+      company: get("company")
+    };
+
+    if (!data.email && !data.phone) {
+      this.setState({ sendState: "error", sendMsg: "Add an email address so Kavitha can reply." });
+      return;
+    }
+
+    // No endpoint configured: hand off to the visitor's mail client.
+    if (!this.leadEndpoint) {
+      const body = [
+        "Name: " + data.name,
+        "Email: " + data.email,
+        data.phone ? "Phone: " + data.phone : "",
+        "Town: " + data.town,
+        "Budget: " + data.budget,
+        "",
+        data.message
+      ].filter((l) => l !== "").join("\n");
+      window.location.href =
+        "mailto:" + this.leadEmail +
+        "?subject=" + encodeURIComponent("Website enquiry" + (data.name ? " from " + data.name : "")) +
+        "&body=" + encodeURIComponent(body);
+      this.setState({ sendState: "sent", sendMsg: "" });
+      return;
+    }
+
+    this.setState({ sendState: "sending", sendMsg: "" });
+
+    fetch(this.leadEndpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    })
+      .then((r) => r.json().then((j) => ({ ok: r.ok, body: j })).catch(() => ({ ok: r.ok, body: {} })))
+      .then((r) => {
+        if (r.ok && r.body && r.body.ok !== false) {
+          form.reset();
+          this.setState({ sendState: "sent", sendMsg: "" });
+        } else {
+          this.setState({
+            sendState: "error",
+            sendMsg: (r.body && r.body.error) || "Could not send. Please call or email instead."
+          });
+        }
+      })
+      .catch(() => {
+        this.setState({
+          sendState: "error",
+          sendMsg: "Could not send. Please call " + "+1 617 513 4321" + " or email instead."
+        });
+      });
+  }
+
   componentDidMount() {
     const root = this.rootRef.current;
     if (!root) return;
+
+    this.buildCombos(root);
 
     // scroll reveals
     const io = new IntersectionObserver((entries) => {
@@ -843,7 +1121,7 @@ class Component extends DCLogic {
         }
         const brand = this.brandRef.current;
         if (brand) {
-          brand.style.fontSize = compact ? "17px" : "19px";
+          brand.style.fontSize = compact ? "19px" : "21px";
         }
       });
     };
@@ -872,6 +1150,7 @@ class Component extends DCLogic {
   componentWillUnmount() {
     window.removeEventListener("scroll", this.onScroll);
     window.removeEventListener("pointermove", this.onMove);
+    if (this.onDocClick) document.removeEventListener("click", this.onDocClick);
   }
 
   wipe() {}
@@ -893,12 +1172,17 @@ class Component extends DCLogic {
       cashLabel: this.money(price * down / 100 + price * 0.02),
       interestLabel: this.money(monthly * n - loan),
       monthlyLabel: this.money(monthly),
-      submitLabel: this.state.sent ? "Request received — we'll be in touch" : "Request three addresses",
+      submitLabel: this.state.sendState === "sending" ? "Sending…"
+        : this.state.sendState === "sent" ? "Request received — we'll be in touch"
+        : "Request",
+      sendMsg: this.state.sendMsg,
+      onSearch: (e) => { e.preventDefault(); this.runSearch(); },
+      onReset: (e) => { e.preventDefault(); this.resetSearch(); },
       onPrice: (e) => this.setState({ price: +e.target.value }),
       onDown: (e) => this.setState({ down: +e.target.value }),
       onRate: (e) => this.setState({ rate: +e.target.value }),
       onYears: (e) => this.setState({ years: +e.target.value }),
-      onSubmit: (e) => { e.preventDefault(); this.setState({ sent: true }); },
+      onSubmit: (e) => this.sendLead(e),
       onNav: (e) => {
         const href = e.currentTarget.getAttribute("href") || "";
         if (href === "#" || !href.startsWith("#")) { e.preventDefault(); return; }

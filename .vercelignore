@@ -1,0 +1,6 @@
+# Kept out of the deploy: local tooling and editor leftovers.
+# The site itself is the two .dc.html pages plus houseimages/ and _ds/.
+
+tools/
+*.bak-*
+.thumbnail
